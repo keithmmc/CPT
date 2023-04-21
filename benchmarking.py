@@ -1,34 +1,54 @@
-import time 
-import random 
-import pandas as pd 
-import numpy as np 
-import merge
+import random
+import time
+import pandas as pd
+import numpy as np
 import bubble
-import quick 
-import counting 
-import insertion 
+import merge
+import counting
+import insertion
+import quick
 
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
+   
+# runs the benchmarking,
+def benchmarking(algorithms, Sizes, runs):
+    # create some variables to append the output to
+    elapsed_times = [] # this should end up with 10 elapsed times for each innermost loop
+    input_size =[] # to record the array size used for each run
+    trials =[] # to record the current trial number for each algorithm
+    type =[] #  to record the name of the sorting algorithm used
 
-def benchmarking(algorhtims, Sizes, runs):
-    
-    elapsed_times = [] 
-    input_size = [] 
-    trials = [] 
-    type = [] 
-    
-    for sort_algo in algorhtims:
-        print(f"running  {sort_algo}")
-        
-    for size in Sizes:
-        for run in range(runs):
-            x = [random.randint(0,100) for i in range (size)]
-    algorhtim = algorhtims[sort_algo]
-    start_time = time.time()
-    algorhtim(x)
-    end_time = time.time()
-    time_elapsed = (end_time - start_time) * 1000
-    
+
+    # for each of the 5 sorting algorithms 
+    for sort_algo in algorithms:
+        print(f"running {sort_algo}")        
+        # for each array size in the size array
+        for size in Sizes:
+            # run this 10 (runs) times for each size for each sort type
+            for run in range(runs):
+                # generate random arrays
+                x = [random.randint(0,100) for i in range(size)]
+                
+                #print(f" function {sort_algo} on array of length {len(x)}")
+                # select the sorting algorithm to use
+                algorithm = algorithms[sort_algo]
+                # time.time return the time in seconds since the epoch as a floating point number
+                start_time = time.time()
+                # run the actual algorithm on the current run on the current array size
+                algorithm(x)
+                end_time = time.time()
+                time_elapsed = (end_time - start_time)* 1000 # to get milliseconds
+                
+                # record the results of current test to the results array
+                elapsed_times.append(time_elapsed)               
+                # record the current run number (from 1 to 10)
+                trials.append(run+1)
+                # record the current size to the input size array
+                input_size.append(size)
+                # record the name of the current sorting algorithm 
+                type.append(sort_algo) 
+
+    # outputs a dataframe with the raw times for each trial              
     df = pd.DataFrame({"Sort":type, "Size":input_size, "Times":elapsed_times, "trialNo":trials})
     return df
 
@@ -72,7 +92,7 @@ if __name__ == "__main__":
 
     # provide the sizes for the arrays to be sorted    
 
-    sizeN = [100,250,500,750,1000,1250,2500,3750,5000,6250,7500,8750,10000]
+    sizeN = [100,250,500,750,1000,1250,2500,3750,5000]
  
     # call the benchmarking function
     results = benchmarking(algorithms, sizeN, 10)
@@ -90,5 +110,3 @@ if __name__ == "__main__":
     plot_averages(df2)
     # export the results to csv
     export_results(results, df2)
-    
-    
